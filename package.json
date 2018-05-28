@@ -1,0 +1,27 @@
+{
+  "name": "node_mongo_todo",
+  "version": "1.0.0",
+  "description": "node mongo to do list",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ihatetoast/tutotodo.git"
+  },
+  "keywords": [
+    "node",
+    "mongo",
+    "mongoose"
+  ],
+  "author": "Katy Cassidy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ihatetoast/tutotodo/issues"
+  },
+  "homepage": "https://github.com/ihatetoast/tutotodo#readme",
+  "dependencies": {
+    "mongodb": "^3.1.0-beta4"
+  }
+}
