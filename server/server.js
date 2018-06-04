@@ -34,3 +34,6 @@ app.post('/tutorials', (request, response) => {
 app.listen(3000, () => {
   console.log('App up and running on ', 3000);
 });
+
+//export so that it can be required in the testing file
+module.exports = { app };
