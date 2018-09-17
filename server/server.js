@@ -28,25 +28,34 @@ app.use(bodyParser.json());
 // @access  private (eventually)
 
 app.post('/api/projects', (request, response) => {
-  console.log("posted");
   console.log(request.body);
   const project = new Project({
     title: request.body.title,
     craft: request.body.craft,
     description: request.body.description
   });
-  project.save().then((doc) => {
-    response.send(doc);
+  project.save().then((data) => {
+    response.send(data);
   }, (err) => {
-    response.status(400).send(err)
+    response.status(400).send(err);
   })
 });
 /* ******************************* */
 /*             GET                 */
 /* ******************************* */
 
-app.get('/api/projects', () => {
-  console.log("got");
+
+// @route   POST api/projects
+// @desc    create a project
+// @access  private (eventually)
+
+app.get('/api/projects', (request, response) => {
+  Project.find().then((data) => {
+    //set to an obj so i can also tack on ohter info along side projects. special error codes 
+    response.send({ data });
+  }, (err) => {
+    response.status(400).send(err);
+  });
 });
 
 
