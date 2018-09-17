@@ -53,8 +53,10 @@ app.get('/api/projects', () => {
 
 
 
-
-
+// export so i can test, sport
+module.exports = {
+  app
+}
 
 // LIST'NIN ON KXPS
 app.listen(3000, () => {
