@@ -1,3 +1,4 @@
+const { ObjectID } = require('mongodb');
 // libes
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -45,8 +46,8 @@ app.post('/api/projects', (request, response) => {
 /* ******************************* */
 
 
-// @route   POST api/projects
-// @desc    create a project
+// @route   GET api/projects
+// @desc    get all projects
 // @access  private (eventually)
 
 app.get('/api/projects', (request, response) => {
@@ -57,10 +58,25 @@ app.get('/api/projects', (request, response) => {
     response.status(400).send(err);
   });
 });
+// @route   GET api/projects/:id
+// @desc    get project by id
+// @access  private (eventually)
 
+app.get('/api/projects/:id', (request, response) => {
+  var id = request.params.id;
+  if (!ObjectID.isValid(id)) {
+    return response.status(404).send();
+  }
 
+  Project.findById(id).then((project) => {
+    if (!project) {
+      response.status(404).send();
+    }
 
-
+    response.send({ project })
+  })
+    .catch((err) => { response.status(400).send() });
+});
 
 // export so i can test, sport
 module.exports = {
