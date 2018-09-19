@@ -52,9 +52,9 @@ app.post('/api/projects', (request, response) => {
 // @access  private (eventually)
 
 app.get('/api/projects', (request, response) => {
-  Project.find().then((data) => {
+  Project.find().then((projects) => {
     //set to an obj so i can also tack on ohter info along side projects. special error codes 
-    response.send({ data });
+    response.send({ projects });
   }, (err) => {
     response.status(400).send(err);
   });
