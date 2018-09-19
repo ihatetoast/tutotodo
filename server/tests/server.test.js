@@ -1,3 +1,5 @@
+const { ObjectID } = require('mongodb');
+
 const expect = require('expect');
 const request = require('supertest');
 
@@ -7,30 +9,30 @@ const { Project } = require('./../models/Project');
 // to clear db so that test is right. must be cleared so that
 // hwat i enter is just one and length is 1
 
-const seedProjects = [
+const projects = [
   {
-
-    "title": "seedProject title1",
-    "craft": "seedProject craft1",
-    "description": "seedProject description1"
+    _id: new ObjectID(),
+    title: "seedProject title1",
+    craft: "seedProject craft1",
+    description: "seedProject description1"
   },
   {
-
-    "title": "seedProject title2",
-    "craft": "seedProject craft2",
-    "description": "seedProject description2"
+    _id: new ObjectID(),
+    title: "seedProject title2",
+    craft: "seedProject craft2",
+    description: "seedProject description2"
   },
   {
-
-    "title": "seedProject title3",
-    "craft": "seedProject craft3",
-    "description": "seedProject description3"
+    _id: new ObjectID(),
+    title: "seedProject title3",
+    craft: "seedProject craft3",
+    description: "seedProject description3"
   }
 ]
 
 beforeEach((done) => {
   Project.remove({}).then(() => {
-    return Project.insertMany(seedProjects)
+    return Project.insertMany(projects)
   }).then(() => done());
 });
 
@@ -85,4 +87,44 @@ describe('GET /api/projects', () => {
       })
       .end(done);
   });
+});
+//projects[0]._id is an obj, so toHexString() turns it into a string
+describe('GET /api/projects/:id', () => {
+  it('should get back the data for the id given', (done) => {
+    request(app)
+      .get(`/api/projects/${projects[0]._id.toHexString()}`)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.project.title).toBe(projects[0].title);
+      })
+      .end(done)
+  })
+
+
+  it('should return 404 if project not found', (done) => {
+    //mock id that's plausible
+    var hexId = new ObjectID().toHexString();
+    request(app)
+      .get(`/api/projects/${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for bad/not poss ids', (done) => {
+    request(app)
+      .get('/api/projects/666')
+      .expect(404)
+      .end(done);
+  });
+})
+
+
+
+
+
+
+
+describe('GET /todos/:id', () => {
+
+
 });

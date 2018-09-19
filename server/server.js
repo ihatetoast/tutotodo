@@ -15,6 +15,7 @@ const {
 } = require('./models/Project');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // takes json and converts to obj attaches to req obj
 app.use(bodyParser.json());
@@ -84,6 +85,6 @@ module.exports = {
 }
 
 // LIST'NIN ON KXPS
-app.listen(3000, () => {
-  console.log("You're tuned in to KXPS FM3000. This is Wolfman Jack.");
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}.`);
 })
