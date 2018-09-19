@@ -71,13 +71,37 @@ app.get('/api/projects/:id', (request, response) => {
 
   Project.findById(id).then((project) => {
     if (!project) {
-      response.status(404).send();
+      return response.status(404).send();
     }
 
     response.send({ project })
   })
     .catch((err) => { response.status(400).send() });
 });
+
+/* ******************************* */
+/*            DELETE               */
+/* ******************************* */
+// @route   DELETE api/projects/:id
+// @desc    delete project by id
+// @access  private (eventually)
+
+app.delete('/api/projects/:id', (request, response) => {
+  var id = request.params.id;
+  if (!ObjectID.isValid(id)) {
+    return response.status(404).send();
+  }
+
+  Project.findByIdAndRemove(id).then((project) => {
+    if (!project) {
+      return response.status(404).send();
+    }
+
+    response.send({ project })
+  })
+    .catch((err) => { response.status(400).send() });
+});
+
 
 // export so i can test, sport
 module.exports = {
