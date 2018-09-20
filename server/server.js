@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { ObjectID } = require('mongodb');
 // libes
 const express = require('express');
@@ -30,7 +31,7 @@ app.use(bodyParser.json());
 // @access  private (eventually)
 
 app.post('/api/projects', (request, response) => {
-  console.log(request.body);
+
   const project = new Project({
     title: request.body.title,
     craft: request.body.craft,
@@ -78,6 +79,51 @@ app.get('/api/projects/:id', (request, response) => {
   })
     .catch((err) => { response.status(400).send() });
 });
+
+/* ******************************* */
+/*            UPDATE               */
+/* ******************************* */
+// @route   UPDATE api/projects/:id
+// @desc    update, edit project by id
+// @access  private (eventually)
+
+app.patch('/api/projects/:id', (request, response) => {
+  var id = request.params.id;
+  //lodash .pick ... Creates an object composed of the picked object properties.
+  // control what can be edited
+  var body = _.pick(request.body, ['title', 'craft', 'description', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return response.status(404).send();
+  }
+  //handling completed: 
+  //  if false to true, set completed at
+  // if true to false, clear completed at
+
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    // if boolean and true
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+  Project.findByIdAndUpdate(id, { $set: body }, { new: true })
+    .then((project) => {
+      if (!project) {
+        return response.status(404).send();
+      }
+
+      response.send({ project })
+    })
+    .catch((err) => { response.status(400).send() });
+
+
+
+});
+
+
+
 
 /* ******************************* */
 /*            DELETE               */

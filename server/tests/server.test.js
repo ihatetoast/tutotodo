@@ -30,6 +30,8 @@ const projects = [
   }
 ]
 
+
+
 beforeEach((done) => {
   Project.remove({}).then(() => {
     return Project.insertMany(projects)
@@ -83,7 +85,7 @@ describe('GET /api/projects', () => {
       .expect(200)
       .expect((response) => {
         // console.log(response.body.data.length);
-        expect(response.body.data.length).toBe(3);
+        expect(response.body.projects.length).toBe(3);
       })
       .end(done);
   });
@@ -116,9 +118,47 @@ describe('GET /api/projects/:id', () => {
       .expect(404)
       .end(done);
   });
+});
+
+describe('DELETE /api/projects/:id', () => {
+  it('should get delete entry for id given', (done) => {
+    var hexId = projects[2]._id.toHexString();
+    request(app)
+      .delete(`/api/projects/${hexId}`)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.project._id).toBe(hexId);
+      })
+      .end((err, response) => {
+        if (err) {
+          return done(err);
+        }
+        //query to see if it exists. expect it to not exist
+        Project.findById(hexId).then((project) => {
+          expect(project).not.toBeTruthy();//replaces .notToExist
+          done();
+        }).catch((err) => done(err));
+
+      });
+  })
+
+
+  it('should return 404 if project not found', (done) => {
+    //mock id that's plausible
+    var hexId = new ObjectID().toHexString();
+    request(app)
+      .delete(`/api/projects/${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for bad/not poss ids', (done) => {
+    request(app)
+      .delete('/api/projects/666')
+      .expect(404)
+      .end(done);
+  });
 })
-
-
 
 
 
