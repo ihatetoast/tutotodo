@@ -14,19 +14,21 @@ const projects = [
     _id: new ObjectID(),
     title: "seedProject title1",
     craft: "seedProject craft1",
-    description: "seedProject description1"
+    description: "seed Project description1"
   },
   {
     _id: new ObjectID(),
     title: "seedProject title2",
     craft: "seedProject craft2",
-    description: "seedProject description2"
+    description: "seed Project description2",
+    completed: true,
+    completedAt: 666
   },
   {
     _id: new ObjectID(),
     title: "seedProject title3",
     craft: "seedProject craft3",
-    description: "seedProject description3"
+    description: "seed Project description3"
   }
 ]
 
@@ -164,7 +166,40 @@ describe('DELETE /api/projects/:id', () => {
 
 
 
-describe('GET /todos/:id', () => {
+describe('PATCH /api/projects/:id', () => {
+  it('should change project', (done) => {
+    //get id of first
+    var hexId = projects[0]._id.toHexString();
+    var description = 'beep bop boop';
 
+    request(app)
+      .patch(`/api/projects/${hexId}`)
+      .send({
+        completed: true,
+        description
+      })
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.project.description).toBe(description);
+        expect(response.body.project.completed).toBe(true);
+        expect(typeof response.body.project.completedAt).toBe('number');
+      })
+      .end(done);
+  })
+  it('should make completedAT empty if not completed', (done) => {
+    //get id
+    var hexId = projects[1]._id.toHexString();
 
+    request(app)
+      .patch(`/api/projects/${hexId}`)
+      .send({
+        completed: false
+      })
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.project.completed).toBe(false);
+        expect(response.body.project.completedAt).not.toBeTruthy();
+      })
+      .end(done);
+  })
 });

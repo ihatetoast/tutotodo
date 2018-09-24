@@ -1,3 +1,4 @@
+require('./config/config');
 const _ = require('lodash');
 const { ObjectID } = require('mongodb');
 // libes
@@ -16,7 +17,7 @@ const {
 } = require('./models/Project');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // takes json and converts to obj attaches to req obj
 app.use(bodyParser.json());
@@ -89,6 +90,7 @@ app.get('/api/projects/:id', (request, response) => {
 
 app.patch('/api/projects/:id', (request, response) => {
   var id = request.params.id;
+
   //lodash .pick ... Creates an object composed of the picked object properties.
   // control what can be edited
   var body = _.pick(request.body, ['title', 'craft', 'description', 'completed']);
