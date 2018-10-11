@@ -49,7 +49,10 @@ app.post('/api/users', (request, response) => {
   user
     .save()
     .then(user => {
-      response.send(user);
+      return user.generateAuthToken();
+    })
+    .then(token => {
+      response.header('x-auth', token).send(user);
     })
     .catch(err => {
       response.status(400).send(err);

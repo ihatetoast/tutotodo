@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-
-//unique make sure there aren't dup emails
-const User = mongoose.model('User', {
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
+const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -26,6 +26,28 @@ const User = mongoose.model('User', {
     }
   ]
 });
+//override a method so that we don't send back private stuff such as tokens and pw
+UserSchema.methods.toJSON = function() {
+  const user = this;
+  const userObj = user.toObject();
+  return _.pick(userObj, ['_id', 'email']);
+};
+//instance methods for UserSchema:
+UserSchema.methods.generateAuthToken = function() {
+  const user = this;
+  //get access val and token val
+  const access = 'auth';
+  const token = jwt
+    .sign({ _id: user._id.toHexString(), access }, 'stevebuscemi')
+    .toString();
+
+  user.tokens = user.tokens.concat([{ access, token }]);
+  return user.save().then(() => {
+    return token;
+  });
+};
+
+const User = mongoose.model('User', UserSchema);
 
 module.exports = {
   User
