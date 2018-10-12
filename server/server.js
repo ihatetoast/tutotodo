@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const { mongoose } = require('./db/mongoose');
 const { User } = require('./models/User');
 const { Project } = require('./models/Project');
+const { authenticate } = require('./middleware/authenticate');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -61,6 +62,14 @@ app.post('/api/users', (request, response) => {
 /* ******************************* */
 /*             GET                 */
 /* ******************************* */
+
+// @route   GET api/users/own
+// @desc    get logged in user
+// @access  private
+
+app.get('/api/users/own', authenticate, (request, response) => {
+  response.send(request.user);
+});
 
 // @route   GET api/projects
 // @desc    get all projects

@@ -27,12 +27,14 @@ const UserSchema = new mongoose.Schema({
   ]
 });
 //override a method so that we don't send back private stuff such as tokens and pw
+
+//instance methods for UserSchema:
 UserSchema.methods.toJSON = function() {
   const user = this;
   const userObj = user.toObject();
   return _.pick(userObj, ['_id', 'email']);
 };
-//instance methods for UserSchema:
+
 UserSchema.methods.generateAuthToken = function() {
   const user = this;
   //get access val and token val
@@ -46,7 +48,25 @@ UserSchema.methods.generateAuthToken = function() {
     return token;
   });
 };
-
+//model methods:
+UserSchema.statics.findByToken = function(token) {
+  const User = this;
+  let decoded;
+  try {
+    decoded = jwt.verify(token, 'stevebuscemi');
+  } catch (err) {
+    //do stuff
+    // return new Promise((resolve, reject) => {
+    //   reject();
+    // });
+    return Promise.reject();
+  }
+  return User.findOne({
+    _id: decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
 const User = mongoose.model('User', UserSchema);
 
 module.exports = {
