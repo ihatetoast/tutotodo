@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -26,6 +28,7 @@ const UserSchema = new mongoose.Schema({
     }
   ]
 });
+
 //override a method so that we don't send back private stuff such as tokens and pw
 
 //instance methods for UserSchema:
@@ -67,6 +70,28 @@ UserSchema.statics.findByToken = function(token) {
     'tokens.access': 'auth'
   });
 };
+
+//middleware from mongoose:
+//do this before saved
+UserSchema.pre('save', function(next) {
+  //access to indiv doco.
+  const user = this;
+  //was pw modified? prevents hashing of hash if pw not modified. don't want to hash a hash or mustache. password here is this.password
+  if (user.isModified('password')) {
+    //pw has been altered, so rehash
+    bcrypt.genSalt(10, function(err, salt) {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        // set user.password in as hash
+        user.password = hash;
+        next();
+      });
+    });
+  } else {
+    //pw has not been altered so do NOT hash.
+    next();
+  }
+});
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports = {
