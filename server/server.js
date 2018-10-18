@@ -59,6 +59,27 @@ app.post('/api/users', (request, response) => {
       response.status(400).send(err);
     });
 });
+
+// @route   POST api/users/login
+// @desc    allows user to login
+// @access  public
+
+app.post('/api/users/login', (request, response) => {
+  const body = _.pick(request.body, ['email', 'password']);
+  //does user exist with email given:
+  //user a model method (see User)
+
+  User.findByCredentials(body.email, body.password)
+    .then(user => {
+      return user.generateAuthToken().then(token => {
+        response.header('x-auth', token).send(user);
+      });
+    })
+    .catch(e => {
+      response.status(400).send();
+    });
+});
+
 /* ******************************* */
 /*             GET                 */
 /* ******************************* */
