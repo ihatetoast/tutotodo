@@ -33,8 +33,8 @@ const userTwoId = new ObjectID();
 const users = [
   {
     _id: userOneId,
-    email: 'passer@example.com',
-    password: 'passwordPass',
+    email: 'userOne@example.com',
+    password: 'userOnePassword!',
     tokens: [
       {
         access: 'auth',
@@ -44,7 +44,7 @@ const users = [
       }
     ]
   },
-  { _id: userTwoId, email: 'failer@example.com', password: 'passwordFail' }
+  { _id: userTwoId, email: 'userTwo@example.com', password: 'userTwoPassword!' }
 ];
 const seedProjects = done => {
   Project.remove({})

@@ -8,7 +8,7 @@ const { Project } = require('./../models/Project');
 const { User } = require('./../models/User');
 const { projects, users, seedProjects, seedUsers } = require('./seed/seed');
 // to clear db so that test is right. must be cleared so that
-// hwat i enter is just one and length is 1
+// what i enter is just one and length is 1
 beforeEach(seedUsers);
 beforeEach(seedProjects);
 
@@ -218,12 +218,14 @@ describe('POST /api/users', () => {
         if (err) {
           return done(err);
         }
-        User.findOne({ email }).then(user => {
-          expect(user).toBeTruthy();
-          //IMPORTANT: if they're equal, then it's not been hashed
-          expect(user.password).not.toBe(password);
-          done();
-        });
+        User.findOne({ email })
+          .then(user => {
+            expect(user).toBeTruthy();
+            //IMPORTANT: if they're equal, then it's not been hashed
+            expect(user.password).not.toBe(password);
+            done();
+          })
+          .catch(e => done(e));
       });
   });
   it('should return validation errors if any fields are invalid', done => {
@@ -243,5 +245,59 @@ describe('POST /api/users', () => {
       .send({ email, password })
       .expect(400)
       .end(done);
+  });
+});
+//2nd user from seed data { _id: userTwoId, email: 'userTwo@example.com', password: 'userTwoPassword!' }
+describe('POST api/users/login', () => {
+  it('should login a user and return the auth token.', done => {
+    request(app)
+      .post('/api/users/login')
+      .send({
+        email: users[1].email,
+        password: users[1].password
+      })
+      .expect(200)
+      .expect(response => {
+        expect(response.headers['x-auth']).toBeTruthy();
+      })
+      .end((err, response) => {
+        if (err) {
+          return done(err);
+        }
+        User.findById(users[1]._id)
+          .then(user => {
+            //see if token is in array.
+            expect(user.tokens[0]).toMatchObject({
+              access: 'auth',
+              token: response.headers['x-auth']
+            });
+
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+  it('should reject login is not valid.', done => {
+    const email = users[1].email;
+    const password = 'thiswontmatter!';
+    request(app)
+      .post('/api/users/login')
+      .send({ email, password })
+      .expect(400)
+      .expect(response => {
+        expect(response.headers['x-auth']).not.toBeTruthy();
+      })
+      .end((err, response) => {
+        if (err) {
+          return done(err);
+        }
+        User.findById(users[1]._id)
+          .then(user => {
+
+            expect(user.tokens.length).toBe(0);
+            done();
+          })
+          .catch(e => done(e));
+      });
   });
 });
