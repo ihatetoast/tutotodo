@@ -201,7 +201,22 @@ app.delete('/api/projects/:id', (request, response) => {
       response.status(400).send();
     });
 });
-
+//authenticate from middleware stores the token
+app.delete('/api/users/own/token', authenticate, (request, response) => {
+  //do stuff
+  //instance method we created is removeToken from user's token arr.
+  request.user.removeToken(request.token).then(
+    () => {
+      response.status(200).send();
+    },
+    () => {
+      response.status(400).send();
+    }
+  );
+});
+/* ******************************* */
+/*          THE SHIZ               */
+/* ******************************* */
 // export so i can test, sport
 module.exports = {
   app
