@@ -1,11 +1,10 @@
-
 var env = process.env.NODE_ENV || 'development';
-console.log("ENV! ------->", env);
 
-if (env === 'development') {
-  process.env.PORT = 3000;
-  process.env.MONGODB_URI = 'mongodb://localhost:27017/ufos';
-} else if (env === 'test') {
-  process.env.PORT = 3000;
-  process.env.MONGODB_URI = 'mongodb://localhost:27017/ufosTest';
+if (env === 'development' || env === 'test') {
+  const config = require('./config.json');
+  const currentEnv = config[env];
+  // Object.keys produces an array of the keys for the obj. in this case it's development and test. for each of those, set process.env[key] to the config argument of key
+  Object.keys(currentEnv).forEach(key => {
+    process.env[key] = currentEnv[key];
+  });
 }

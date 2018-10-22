@@ -1,14 +1,16 @@
-# UFOs
+# UFOs API
 
-Near complete purge to refactor this for unfinished craft projects.
+An API to help you\* keep track of unfinished craft projects. User can sign up, login, create a document (title, craft, description, and completed or not), as well as delete and update it.
 
-```
-notes to myself:
-cd mongo/bin
-~/mongo/bin: ./mongod --dbpath ~/mongo-data
+### Toolbox:
 
-gets it up and running
+- Express
+- Body-parser
+- Jsonwebtoken
+- Lodash
+- Mongodb & Mongoose
+- Validator
+- Bcryptjs
+- Mocha, Expect, Supertest
 
-new tab:
-mongo
-```
+\* By 'you', I mean me. Let's be honest.
