@@ -4,12 +4,16 @@ const jwt = require('jsonwebtoken');
 const { Project } = require('./../../models/Project');
 const { User } = require('./../../models/User');
 
+const userOneId = new ObjectID();
+const userTwoId = new ObjectID();
+
 const projects = [
   {
     _id: new ObjectID(),
     title: 'seedProject title1',
     craft: 'seedProject craft1',
-    description: 'seed Project description1'
+    description: 'seed Project description1',
+    _createdBy: userOneId
   },
   {
     _id: new ObjectID(),
@@ -17,18 +21,17 @@ const projects = [
     craft: 'seedProject craft2',
     description: 'seed Project description2',
     completed: true,
-    completedAt: 666
+    completedAt: 666,
+    _createdBy: userTwoId
   },
   {
     _id: new ObjectID(),
     title: 'seedProject title3',
     craft: 'seedProject craft3',
-    description: 'seed Project description3'
+    description: 'seed Project description3',
+    _createdBy: userTwoId
   }
 ];
-
-const userOneId = new ObjectID();
-const userTwoId = new ObjectID();
 
 const users = [
   {
@@ -44,8 +47,21 @@ const users = [
       }
     ]
   },
-  { _id: userTwoId, email: 'userTwo@example.com', password: 'userTwoPassword!' }
+  {
+    _id: userTwoId,
+    email: 'userTwo@example.com',
+    password: 'userTwoPassword!',
+    tokens: [
+      {
+        access: 'auth',
+        token: jwt
+          .sign({ _id: userTwoId, access: 'auth' }, 'stevebuscemi')
+          .toString()
+      }
+    ]
+  }
 ];
+
 const seedProjects = done => {
   Project.remove({})
     .then(() => {

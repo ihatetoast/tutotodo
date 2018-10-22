@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-
+//Projects will need to be associated with a user (see _createdBy & type: mongoose.Schema.Types.ObjectId,)
 const Project = mongoose.model('Project', {
   title: {
     type: String,
@@ -27,6 +27,10 @@ const Project = mongoose.model('Project', {
   completedAt: {
     type: Number,
     default: null
+  },
+  _createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
 });
 

@@ -23,13 +23,14 @@ app.use(bodyParser.json());
 
 // @route   POST api/projects
 // @desc    create a project
-// @access  private (eventually)
+// @access  private
 
-app.post('/api/projects', (request, response) => {
+app.post('/api/projects', authenticate, (request, response) => {
   const project = new Project({
     title: request.body.title,
     craft: request.body.craft,
-    description: request.body.description
+    description: request.body.description,
+    _createdBy: request.user._id
   });
   project.save().then(
     data => {
@@ -96,11 +97,15 @@ app.get('/api/users/own', authenticate, (request, response) => {
 // @desc    get all projects
 // @access  private (eventually)
 
-app.get('/api/projects', (request, response) => {
-  Project.find().then(
+app.get('/api/projects', authenticate, (request, response) => {
+  //keep specific to user who is logged in:  _createdBy: request.user._id
+  Project.find({
+    _createdBy: request.user._id
+  }).then(
     projects => {
-      //set to an obj so i can also tack on ohter info along side projects. special error codes
-      response.send({ projects });
+      response.send({
+        projects
+      });
     },
     err => {
       response.status(400).send(err);
@@ -111,13 +116,16 @@ app.get('/api/projects', (request, response) => {
 // @desc    get project by id
 // @access  private (eventually)
 
-app.get('/api/projects/:id', (request, response) => {
+app.get('/api/projects/:id', authenticate, (request, response) => {
   var id = request.params.id;
   if (!ObjectID.isValid(id)) {
     return response.status(404).send();
   }
 
-  Project.findById(id)
+  Project.findOne({
+    _createdBy: request.user._id,
+    _id: id
+  })
     .then(project => {
       if (!project) {
         return response.status(404).send();
@@ -131,13 +139,13 @@ app.get('/api/projects/:id', (request, response) => {
 });
 
 /* ******************************* */
-/*            UPDATE               */
+/*            PATCH                */
 /* ******************************* */
-// @route   UPDATE api/projects/:id
+// @route   PATCH api/projects/:id
 // @desc    update, edit project by id
 // @access  private (eventually)
 
-app.patch('/api/projects/:id', (request, response) => {
+app.patch('/api/projects/:id', authenticate, (request, response) => {
   var id = request.params.id;
 
   //lodash .pick ... Creates an object composed of the picked object properties.
@@ -163,7 +171,11 @@ app.patch('/api/projects/:id', (request, response) => {
     body.completed = false;
     body.completedAt = null;
   }
-  Project.findByIdAndUpdate(id, { $set: body }, { new: true })
+  Project.findOneAndUpdate(
+    { _createdBy: request.user._id, _id: id },
+    { $set: body },
+    { new: true }
+  )
     .then(project => {
       if (!project) {
         return response.status(404).send();
@@ -183,13 +195,16 @@ app.patch('/api/projects/:id', (request, response) => {
 // @desc    delete project by id
 // @access  private (eventually)
 
-app.delete('/api/projects/:id', (request, response) => {
+app.delete('/api/projects/:id', authenticate, (request, response) => {
   var id = request.params.id;
   if (!ObjectID.isValid(id)) {
     return response.status(404).send();
   }
 
-  Project.findByIdAndRemove(id)
+  Project.findOneAndRemove({
+    _createdBy: request.user._id,
+    _id: id
+  })
     .then(project => {
       if (!project) {
         return response.status(404).send();
