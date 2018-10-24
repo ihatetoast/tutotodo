@@ -82,7 +82,7 @@ describe('POST api/users/login', () => {
         User.findById(users[1]._id)
           .then(user => {
             //see if token is in array.
-            expect(user.tokens[1]).toMatchObject({
+            expect(user.toObject().tokens[1]).toMatchObject({
               access: 'auth',
               token: response.headers['x-auth']
             });
@@ -100,7 +100,7 @@ describe('POST api/users/login', () => {
       .send({ email, password })
       .expect(400)
       .expect(response => {
-        expect(response.headers['x-auth']).not.toBeTruthy();
+        expect(response.headers['x-auth']).toBeFalsy();
       })
       .end((err, response) => {
         if (err) {
@@ -156,11 +156,9 @@ describe('POST /api/users', () => {
       .end(done);
   });
   it('should not create a user if email has already been registered.', done => {
-    const email = users[0].email;
-    const password = 'thiswontmatter!';
     request(app)
       .post('/api/users')
-      .send({ email, password })
+      .send({ email: users[0].email, password: 'thiswontmatter!' })
       .expect(400)
       .end(done);
   });
@@ -267,7 +265,7 @@ describe('DELETE /api/projects/:id', () => {
         //query to see if it exists. expect it to not exist
         Project.findById(hexId)
           .then(project => {
-            expect(project).not.toBeTruthy(); //replaces .notToExist
+            expect(project).toBeFalsy(); //replaces .notToExist
             done();
           })
           .catch(err => done(err));
@@ -367,7 +365,7 @@ describe('PATCH /api/projects/:id', () => {
       .expect(200)
       .expect(response => {
         expect(response.body.project.completed).toBe(false);
-        expect(response.body.project.completedAt).not.toBeTruthy();
+        expect(response.body.project.completedAt).toBeFalsy();
       })
       .end(done);
   });

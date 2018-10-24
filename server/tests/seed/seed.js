@@ -36,7 +36,7 @@ const projects = [
 const users = [
   {
     _id: userOneId,
-    email: 'userOne@example.com',
+    email: 'userone@example.com',
     password: 'userOnePassword!',
     tokens: [
       {
@@ -49,7 +49,7 @@ const users = [
   },
   {
     _id: userTwoId,
-    email: 'userTwo@example.com',
+    email: 'usertwo@example.com',
     password: 'userTwoPassword!',
     tokens: [
       {

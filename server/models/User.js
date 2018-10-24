@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+//const uniqueValidator = require('mongoose-unique-validator');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
@@ -7,10 +8,11 @@ const bcrypt = require('bcryptjs');
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
+    lowercase: true,
     required: true,
+    unique: true,
     trim: true,
     minlength: 3,
-    unique: true,
     validate: {
       validator: validator.isEmail,
       message: '{value} is not a valid email address.'
@@ -124,6 +126,7 @@ UserSchema.pre('save', function(next) {
   }
 });
 
+//UserSchema.plugin(uniqueValidator, { message: 'is already taken.' });
 const User = mongoose.model('User', UserSchema);
 
 module.exports = {
